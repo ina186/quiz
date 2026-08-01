@@ -1,0 +1,942 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Вспомнить всё! 3 класс</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #B088F9;
+            --lilac: #DAB6FC;
+            --peach: #FFD3B6;
+            --pink: #FFAAA5;
+            --text-main: #2C1844;
+            --text-light: #523873;
+            --white-glass: rgba(255, 255, 255, 0.9);
+            --border-glass: rgba(255, 255, 255, 1);
+        }
+
+        body {
+            margin: 0;
+            padding: 20px 0;
+            min-height: 100vh;
+            font-family: 'Nunito', sans-serif;
+            background-color: #ffffff;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(176, 136, 249, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(255, 211, 182, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 170, 165, 0.2) 0%, transparent 60%);
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 750px;
+            margin: 0 15px;
+            padding: 40px 30px;
+            background: var(--white-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid var(--border-glass);
+            border-radius: 40px;
+            box-shadow: 0 15px 50px rgba(176, 136, 249, 0.15);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            flex-grow: 1;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .main-title {
+            text-align: center;
+            font-size: 3.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            margin-top: 0;
+            line-height: 1.2;
+        }
+
+        .desc {
+            text-align: center;
+            font-size: 1.4rem;
+            line-height: 1.5;
+            margin-bottom: 40px;
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
+        .btn-modern {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            font-size: 1.6rem;
+            font-weight: 900;
+            font-family: inherit;
+            color: var(--text-main);
+            background: #ffffff;
+            border: 2px solid var(--lilac);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(176, 136, 249, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            border: none;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--lilac), var(--peach));
+            color: var(--text-main);
+        }
+
+        /* Прогресс-бар */
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(176, 136, 249, 0.2);
+            border-radius: 6px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            display: none;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--purple), var(--pink));
+            border-radius: 6px;
+            transition: width 0.4s ease;
+        }
+
+        /* Стили для заданий */
+        .task-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .task-counter {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--pink);
+            background: rgba(255, 170, 165, 0.2);
+            padding: 8px 20px;
+            border-radius: 25px;
+        }
+
+        .task-topic {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--purple);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .task-body-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .task-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .controls {
+            width: 100%;
+        }
+
+        .math-text {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .word-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.5;
+            text-align: left;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 30px;
+            border: 2px solid var(--lilac);
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .word-answer-inline {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-top: 15px;
+            gap: 10px;
+        }
+
+        /* Поля ввода */
+        input[type="number"] {
+            font-family: 'Nunito', sans-serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 900;
+            color: var(--text-main);
+            width: clamp(80px, 15vw, 130px);
+            text-align: center;
+            padding: 10px;
+            border: 4px solid var(--lilac);
+            border-radius: 20px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            outline: none;
+            box-shadow: inset 0 3px 10px rgba(0,0,0,0.05);
+            margin: 0;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 15px rgba(176, 136, 249, 0.4), inset 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .shake {
+            animation: shake 0.4s;
+            border-color: var(--pink) !important;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        /* Кнопки сравнения */
+        .cmp-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+        .cmp-text {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 900;
+            white-space: normal;
+            word-wrap: break-word;
+            text-align: center;
+        }
+        .cmp-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .cmp-btn {
+            font-family: 'Nunito', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 900;
+            width: clamp(75px, 15vw, 100px);
+            height: clamp(75px, 15vw, 100px);
+            border-radius: 25px;
+            border: 4px solid var(--purple);
+            background: #ffffff;
+            color: var(--purple);
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 5px 15px rgba(176, 136, 249, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .cmp-btn:hover {
+            background: var(--purple);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        /* Периметр контейнер */
+        .perimeter-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 35px;
+            border-radius: 30px;
+            border: 2px solid var(--lilac);
+            box-sizing: border-box;
+            gap: 30px;
+        }
+        .perimeter-condition {
+            text-align: left;
+            font-size: 1.8rem;
+            font-weight: 700;
+            flex: 1;
+        }
+        .perimeter-line {
+            margin-bottom: 12px;
+        }
+        .perimeter-visual-wrapper {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .rect-visual {
+            border: 5px solid var(--purple);
+            background: rgba(176, 136, 249, 0.1);
+            position: relative;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .rect-center-text {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--purple);
+        }
+        .rect-label {
+            position: absolute;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--purple);
+            white-space: nowrap;
+        }
+        .rect-label.top { bottom: 100%; margin-bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .rect-label.right { left: 100%; margin-left: 15px; top: 50%; transform: translateY(-50%); }
+
+        /* Часы */
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .clock-inputs {
+            margin-top: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            font-size: 2.5rem;
+            font-weight: 900;
+            gap: 10px;
+        }
+
+        /* Экран результатов */
+        .huge-emoji {
+            font-size: 160px;
+            line-height: 1.1;
+            text-align: center;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.2));
+            animation: popIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .result-level { font-size: 2.5rem; color: var(--purple); font-weight: 900; margin-bottom: 25px; text-align: center; line-height: 1.2; }
+        .result-text { font-size: 1.6rem; line-height: 1.6; text-align: center; background: rgba(255,255,255,0.9); padding: 30px; border-radius: 30px; border: 2px solid var(--lilac); font-weight: 700; }
+        .score-display { font-size: 2.2rem; font-weight: 900; text-align: center; margin-top: 30px; color: var(--text-main); }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Мобильная адаптация */
+        @media (max-width: 600px) {
+            body {
+                align-items: flex-start;
+            }
+            .app-container {
+                padding: 30px 20px;
+                border-radius: 30px;
+            }
+            .main-title { font-size: 2.5rem; }
+            .task-topic { font-size: 1.8rem; margin-bottom: 10px; }
+            
+            .word-text { font-size: 1.5rem; padding: 20px; }
+            .word-answer-inline { font-size: 1.5rem; }
+
+            .clock-inputs { font-size: 2rem; margin-top: 20px; }
+
+            .perimeter-container {
+                flex-direction: column;
+                padding: 25px 20px;
+                gap: 25px;
+            }
+            .perimeter-visual-wrapper {
+                order: -1;
+                margin-top: 15px;
+                margin-bottom: 10px;
+            }
+            .perimeter-condition {
+                width: 100%;
+                font-size: 1.6rem;
+            }
+            
+            .huge-emoji { font-size: 120px; }
+            .result-level { font-size: 2rem; }
+            .result-text { font-size: 1.4rem; padding: 20px; }
+            .btn-modern { font-size: 1.4rem; padding: 15px; margin-bottom: 10px; }
+            
+            .task-content { margin-bottom: 15px; } 
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <div class="progress-bar" id="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <!-- Стартовый экран -->
+    <div id="screen-start" class="screen active">
+        <h1 class="main-title">Операция:<br>Вспомнить всё!</h1>
+        <p class="desc">Летний квест-проверка перед 3-м классом.<br>Только для тех, кто готов к приключениям!</p>
+        
+        <div style="margin-top: auto;">
+            <button class="btn-modern btn-primary" onclick="initApp()">Поехали! 🚀</button>
+        </div>
+    </div>
+
+    <!-- Универсальный экран для одного задания -->
+    <div id="screen-task" class="screen">
+        <div class="task-header">
+            <div class="task-counter" id="task-counter">0%</div>
+        </div>
+        <div class="task-topic" id="task-topic">Тема</div>
+        
+        <div class="task-body-wrapper">
+            <div class="task-content" id="task-content">
+                <!-- Содержимое генерируется JS -->
+            </div>
+
+            <div class="controls" id="controls">
+                <button class="btn-modern btn-primary" id="btn-next" onclick="submitAnswer()">Принять ответ ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран результатов -->
+    <div id="screen-result" class="screen">
+        <div class="huge-emoji" id="result-emoji">🦥</div>
+        <h1 class="main-title" style="font-size: 2.8rem; margin-bottom: 10px;">Результаты квеста</h1>
+        <div class="result-level" id="result-level">Уровень: </div>
+        <div class="result-text" id="result-text"></div>
+        <div class="score-display">
+            Правильных ответов: <span id="score-text" style="color: var(--purple);"></span>
+        </div>
+        <div style="margin-top: auto; margin-top: 40px;">
+            <button class="btn-modern btn-primary" onclick="location.reload()">Пройти ещё раз 🔄</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
+    let tasks = [];
+    let currentTaskIndex = 0;
+    let score = 0;
+
+    function rand(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // --- БЕЗОПАСНАЯ ГЕНЕРАЦИЯ (Исключение повторов подряд) ---
+    function shareNumber(p1, p2) {
+        if(!p1 || !p2) return false;
+        return p1[0]===p2[0] || p1[0]===p2[1] || p1[1]===p2[0] || p1[1]===p2[1];
+    }
+
+    function getSafeSequence(pool) {
+        let result = [];
+        let used = new Array(pool.length).fill(false);
+
+        function backtrack(path) {
+            if (path.length === pool.length) {
+                result = path.slice();
+                return true;
+            }
+            for (let i = 0; i < pool.length; i++) {
+                if (used[i]) continue;
+                if (path.length > 0 && shareNumber(path[path.length - 1], pool[i])) continue;
+                
+                used[i] = true;
+                path.push(pool[i]);
+                if (backtrack(path)) return true;
+                path.pop();
+                used[i] = false;
+            }
+            return false;
+        }
+
+        pool.sort(() => Math.random() - 0.5);
+        if (backtrack([])) {
+            return result;
+        } else {
+            for(let i=0; i<pool.length-1; i++) {
+                if(shareNumber(pool[i], pool[i+1])) {
+                    for(let j=i+2; j<pool.length; j++) {
+                        if(!shareNumber(pool[i], pool[j]) && (j===pool.length-1 || !shareNumber(pool[i+1], pool[j+1]))) {
+                            let tmp = pool[i+1]; pool[i+1] = pool[j]; pool[j] = tmp;
+                            break;
+                        }
+                    }
+                }
+            }
+            return pool; 
+        }
+    }
+
+    // --- ГЕНЕРАТОРЫ ПРИМЕРОВ ---
+    function generateValidAddSub(withCross) {
+        let tries = 0;
+        while(tries < 1000) {
+            let isAdd = Math.random() > 0.5;
+            let a = rand(21, 89);
+            let b = rand(2, 79);
+            if (isAdd) {
+                if (a + b <= 99) {
+                    let onesSum = (a % 10) + (b % 10);
+                    if (withCross && onesSum > 10) return {text: `${a} + ${b} =`, ans: a+b};
+                    if (!withCross && onesSum <= 10 && a%10!==0 && b%10!==0) return {text: `${a} + ${b} =`, ans: a+b};
+                }
+            } else {
+                if (a - b >= 21) {
+                    let onesDiff = (a % 10) - (b % 10);
+                    if (withCross && onesDiff < 0) return {text: `${a} - ${b} =`, ans: a-b};
+                    if (!withCross && onesDiff >= 0 && a%10!==0 && b%10!==0) return {text: `${a} - ${b} =`, ans: a-b};
+                    if (!withCross && (a%10===0) && b<10) return {text: `${a} - ${b} =`, ans: a-b}; 
+                }
+            }
+            tries++;
+        }
+        return {text: `44 + 6 =`, ans: 50}; 
+    }
+
+    function buildAllTasks() {
+        tasks = [];
+        
+        let addSub = [];
+        for(let i=0; i<3; i++) addSub.push(generateValidAddSub(false));
+        for(let i=0; i<3; i++) addSub.push(generateValidAddSub(true));
+        addSub.sort(() => Math.random() - 0.5).forEach(t => {
+            tasks.push({ topic: "Счёт до 100", type: "input", text: t.text, ans: t.ans });
+        });
+
+        let multReq = [
+            Math.random() > 0.5 ? [7,8] : [8,7],
+            [3,7], [4,7], [6,7], [4,8], [3,8]
+        ];
+        
+        let safeSpacers = [];
+        for(let a of [3,4,6,9]) {
+            for(let b of [3,4,6,9]) {
+                safeSpacers.push([a,b]);
+            }
+        }
+        safeSpacers.sort(() => Math.random() - 0.5);
+        
+        let twinCount = 0;
+        for (let p of safeSpacers) {
+            if (multReq.length >= 10) break;
+            if (p[0] === p[1]) {
+                if (twinCount >= 1) continue;
+                twinCount++;
+            }
+            multReq.push(p);
+        }
+        
+        let finalMult = getSafeSequence(multReq);
+        finalMult.forEach(p => {
+            tasks.push({ topic: "Таблица умножения", type: "input", text: `${p[0]} &times; ${p[1]} =`, ans: p[0]*p[1] });
+        });
+
+        const allowedMult = [3,4,6,7,8,9];
+        let divReq = [];
+        for (let a of allowedMult) {
+            for (let b of allowedMult) {
+                divReq.push({a: a, b: b});
+            }
+        }
+        divReq.sort(() => Math.random() - 0.5);
+        let divCases = [];
+        let dTwin = false;
+        
+        for(let c of divReq) {
+            if(divCases.length >= 3) break;
+            if(c.a === c.b) {
+                if(dTwin) continue;
+                dTwin = true;
+            }
+            if(divCases.length > 0) {
+                let last = divCases[divCases.length-1];
+                if(last.a === c.a || last.a === c.b || last.b === c.a || last.b === c.b) continue;
+            }
+            divCases.push(c);
+        }
+
+        divCases.forEach(p => {
+            tasks.push({ topic: "Деление", type: "input", text: `${p.a * p.b} : ${p.a} =`, ans: p.b });
+        });
+
+        let bCount = 0;
+        while(bCount < 3) {
+            let b = rand(2, 20); let c = rand(2, 20); let a = rand(b+c+5, 80);
+            if (a - b + c !== a - (b + c)) {
+                tasks.push({ topic: "Порядок действий", type: "input", text: `${a} - (${b} + ${c}) =`, ans: a - (b + c) });
+                bCount++;
+            }
+        }
+
+        let cmpTemplates = [{u1:'см', u2:'мм', m:10}, {u1:'дм', u2:'см', m:10}, {u1:'м', u2:'дм', m:10}];
+        for(let i=0; i<4; i++) {
+            let t = cmpTemplates[rand(0,2)];
+            let bigUnitNum = rand(3, 8); 
+            let smallUnitNum;
+            
+            if (Math.random() > 0.5) {
+                smallUnitNum = bigUnitNum * 10 - rand(1, 6); 
+            } else {
+                smallUnitNum = bigUnitNum * 10 + rand(1, 6); 
+            }
+            
+            let val1 = bigUnitNum * t.m;
+            let val2 = smallUnitNum;
+            let ans = val1 > val2 ? '>' : '<';
+            
+            if (Math.random() > 0.5) {
+                tasks.push({ topic: "Сравнение величин", type: "compare", textLeft: `${bigUnitNum} ${t.u1}`, textRight: `${smallUnitNum} ${t.u2}`, ans: ans });
+            } else {
+                tasks.push({ topic: "Сравнение величин", type: "compare", textLeft: `${smallUnitNum} ${t.u2}`, textRight: `${bigUnitNum} ${t.u1}`, ans: ans === '>' ? '<' : '>' });
+            }
+        }
+
+        let pa = rand(3, 8); let pb = rand(4, 9); if(pa===pb) pb++;
+        tasks.push({ topic: "Периметр прямоугольника", type: "perimeter", a: pa, b: pb, ans: (pa+pb)*2 });
+
+        let words = [
+            { q: `Летом на площадке играли ${rand(5, 12)} детей. Потом к ним прибежали ещё ${rand(3, 8)}. Сколько детей стало на площадке?`, ansCalc: (a,b)=>a+b, p: '', u: 'детей стало.' },
+            { q: `У бабушки на даче выросло ${rand(15, 25)} арбузов. Семья съела ${rand(3, 7)} арбузов. Сколько арбузов осталось?`, ansCalc: (a,b)=>a-b, p: '', u: 'арбузов осталось.' },
+            { q: `В корзине было несколько яблок. Когда туда положили ещё ${rand(2, 6)}, их стало ${rand(12, 18)}. Сколько яблок было сначала?`, ansCalc: (a,b)=>b-a, p: '', u: 'яблок было.' },
+            { q: `Маша нашла ${rand(15, 25)} красивых ракушек, а Петя &mdash; ${rand(5, 10)}. На сколько больше ракушек нашла Маша?`, ansCalc: (a,b)=>a-b, p: 'на', u: 'ракушек больше.' }
+        ];
+        words.forEach((w, i) => {
+            let nums = w.q.match(/\d+/g).map(Number);
+            let ans = w.ansCalc(nums[0], nums[1]);
+            tasks.push({ topic: `Летние задачки (${i+1}/4)`, type: "word", text: w.q, ans: ans, p: w.p, unit: w.u });
+        });
+
+        let clocks = [
+            {h: rand(1, 12), m: 0},
+            {h: rand(1, 12), m: [20, 30, 40][rand(0,2)]},
+            {h: rand(1, 12), m: [15, 25, 35, 45, 55][rand(0,4)]}
+        ].sort(() => Math.random() - 0.5);
+        clocks.forEach((c, i) => {
+            tasks.push({ topic: `Который час? (${i+1}/3)`, type: "clock", h: c.h, m: c.m });
+        });
+    }
+
+    function initApp() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        buildAllTasks();
+        currentTaskIndex = 0;
+        score = 0;
+        document.getElementById('progress-bar').style.display = 'block';
+        document.getElementById('screen-task').classList.add('active');
+        renderTask();
+    }
+
+    function renderTask() {
+        if (currentTaskIndex >= tasks.length) {
+            showResults();
+            return;
+        }
+
+        const task = tasks[currentTaskIndex];
+        
+        let percent = Math.round((currentTaskIndex / tasks.length) * 100);
+        document.getElementById('task-counter').innerText = `${percent}%`;
+        document.getElementById('task-topic').innerText = task.topic;
+        document.getElementById('progress-fill').style.width = percent + '%';
+
+        const content = document.getElementById('task-content');
+        const btnNext = document.getElementById('btn-next');
+        
+        btnNext.style.display = 'block'; 
+
+        let html = '';
+
+        if (task.type === 'input') {
+            let eqParts = task.text.split(" =");
+            html = `<div class="math-text">
+                        <span>${eqParts[0]} =</span>
+                        <input type="number" id="input-ans" autocomplete="off">
+                    </div>`;
+        } 
+        else if (task.type === 'compare') {
+            btnNext.style.display = 'none';
+            html = `<div class="cmp-container">
+                        <div class="cmp-text">${task.textLeft} ... ${task.textRight}</div>
+                        <div class="cmp-buttons">
+                            <button class="cmp-btn" onclick="submitAnswer('>')">&gt;</button>
+                            <button class="cmp-btn" onclick="submitAnswer('<')">&lt;</button>
+                            <button class="cmp-btn" onclick="submitAnswer('=')">=</button>
+                        </div>
+                    </div>`;
+        }
+        else if (task.type === 'perimeter') {
+            let maxSide = Math.max(task.a, task.b);
+            let scale = 120 / maxSide; 
+            let w = task.b * scale;
+            let h = task.a * scale;
+            
+            html = `<div class="perimeter-container">
+                        <div class="perimeter-condition">
+                            <div class="perimeter-line">Найди периметр прямоугольника:</div>
+                            <div class="perimeter-line">a = ${task.a} см</div>
+                            <div class="perimeter-line">b = ${task.b} см</div>
+                            <div class="perimeter-line" style="margin-top: 15px; color: var(--purple);">Р прям. = ? см</div>
+                            <div class="word-answer-inline" style="margin-top: 25px;">
+                                Ответ: Р прям. = <input type="number" id="input-ans" autocomplete="off" style="width: 100px; padding: 5px;"> см.
+                            </div>
+                        </div>
+                        <div class="perimeter-visual-wrapper">
+                            <div class="rect-visual" style="width: ${w}px; height: ${h}px;">
+                                <div class="rect-label top">${task.b} см</div>
+                                <div class="rect-label right">${task.a} см</div>
+                                <div class="rect-center-text">Р = ?</div>
+                            </div>
+                        </div>
+                    </div>`;
+        }
+        else if (task.type === 'word') {
+            html = `<div class="word-text">
+                        <div style="margin-bottom: 25px;">${task.text}</div>
+                        <div class="word-answer-inline">
+                            Ответ: <span style="${task.p ? 'margin: 0 5px;' : 'display:none;'}">${task.p}</span>
+                            <input type="number" id="input-ans" autocomplete="off" style="width: 100px; padding: 5px;"> 
+                            <span style="margin-left:5px; white-space: normal;">${task.unit}</span>
+                        </div>
+                    </div>`;
+        }
+        else if (task.type === 'clock') {
+            html = `<div class="clock-container">
+                        <canvas id="clockCanvas" width="240" height="240"></canvas>
+                        <div class="clock-inputs">
+                            <input type="number" id="ans_h" autocomplete="off" placeholder="ч"> ч 
+                            <input type="number" id="ans_m" autocomplete="off" placeholder="м"> мин
+                        </div>
+                    </div>`;
+        }
+
+        content.innerHTML = html;
+
+        if (task.type === 'clock') {
+            drawClock("clockCanvas", task.h, task.m);
+        }
+
+        const inputs = content.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') submitAnswer();
+            });
+        });
+    }
+
+    function submitAnswer(compareChoice = null) {
+        const task = tasks[currentTaskIndex];
+        let isCorrect = false;
+
+        if (task.type === 'compare') {
+            if (compareChoice === task.ans) isCorrect = true;
+        } 
+        else if (task.type === 'clock') {
+            let hInput = document.getElementById('ans_h');
+            let mInput = document.getElementById('ans_m');
+            if (hInput.value.trim() === '' || mInput.value.trim() === '') {
+                hInput.classList.add('shake'); mInput.classList.add('shake');
+                setTimeout(() => { hInput.classList.remove('shake'); mInput.classList.remove('shake'); }, 400);
+                return;
+            }
+            let hVal = parseInt(hInput.value) || 0;
+            let mVal = parseInt(mInput.value) || 0;
+            
+            let altH = task.h + 12;
+            let zeroH = task.h === 12 ? 0 : -1;
+            let tfH = task.h === 12 ? 24 : -1;
+
+            if ((hVal === task.h || hVal === altH || hVal === zeroH || hVal === tfH) && mVal === task.m) {
+                isCorrect = true;
+            }
+        } 
+        else {
+            let el = document.getElementById('input-ans');
+            if (!el || el.value.trim() === '') {
+                if(el) {
+                    el.classList.add('shake');
+                    setTimeout(() => el.classList.remove('shake'), 400);
+                }
+                return;
+            }
+            if (parseInt(el.value) === task.ans) isCorrect = true;
+        }
+
+        if (isCorrect) score++;
+        currentTaskIndex++;
+        renderTask();
+    }
+
+    function drawClock(canvasId, h, m) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const r = canvas.width / 2;
+        
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        ctx.translate(r, r);
+
+        ctx.beginPath(); ctx.arc(0, 0, r - 5, 0, 2 * Math.PI);
+        ctx.fillStyle = '#ffffff'; ctx.fill();
+        ctx.lineWidth = 6; ctx.strokeStyle = '#B088F9'; ctx.stroke();
+
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.font = "bold 22px 'Nunito', sans-serif";
+        ctx.fillStyle = "#2C1844";
+
+        for(let i=1; i<=60; i++) {
+            let ang = i * Math.PI / 30;
+            if (i % 5 === 0) {
+                let num = i / 5;
+                let numAng = num * Math.PI / 6;
+                let nx = (r - 28) * Math.sin(numAng);
+                let ny = -(r - 28) * Math.cos(numAng);
+                ctx.fillText(num.toString(), nx, ny);
+                
+                ctx.rotate(ang);
+                ctx.beginPath(); ctx.moveTo(0, -r + 5); ctx.lineTo(0, -r + 12);
+                ctx.lineWidth = 4; ctx.strokeStyle = "#B088F9"; ctx.stroke();
+                ctx.rotate(-ang);
+            } else {
+                ctx.rotate(ang);
+                ctx.beginPath(); ctx.moveTo(0, -r + 5); ctx.lineTo(0, -r + 10);
+                ctx.lineWidth = 2; ctx.strokeStyle = "rgba(176, 136, 249, 0.5)"; ctx.stroke();
+                ctx.rotate(-ang);
+            }
+        }
+
+        let hourAng = (h%12) * Math.PI/6 + m * Math.PI/(6*60);
+        let minAng = m * Math.PI/30;
+
+        ctx.rotate(hourAng);
+        ctx.beginPath(); ctx.moveTo(0, 15); ctx.lineTo(0, -r + 55); 
+        ctx.lineCap = 'round'; ctx.lineWidth = 9; ctx.strokeStyle = '#2C1844'; ctx.stroke();
+        ctx.rotate(-hourAng);
+
+        ctx.rotate(minAng);
+        ctx.beginPath(); ctx.moveTo(0, 15); ctx.lineTo(0, -r + 15); 
+        ctx.lineWidth = 4; ctx.strokeStyle = '#FF7675'; ctx.stroke();
+        ctx.rotate(-minAng);
+
+        ctx.beginPath(); ctx.arc(0,0,8,0,2*Math.PI);
+        ctx.fillStyle = '#B088F9'; ctx.fill();
+
+        ctx.translate(-r, -r);
+    }
+
+    function showResults() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('progress-bar').style.display = 'none';
+        
+        const resultScreen = document.getElementById('screen-result');
+        resultScreen.classList.add('active');
+
+        document.getElementById('score-text').innerText = `${score} из ${tasks.length}`;
+
+        const percentage = Math.round((score / tasks.length) * 100);
+        let levelTitle = "";
+        let levelText = "";
+        let emoji = "";
+
+        if (percentage >= 85) {
+            emoji = "🧠";
+            levelTitle = "Сверхразум";
+            levelText = "100% &mdash; да ты чемпион! Подожди-ка... Может быть, ты &mdash; взрослый? Или вообще нейросеть? 🤖 Если ты &mdash; это действительно ты, то прими мои восхищенные поздравления! ТЫ готов к третьему классу на все 100%! 🚀";
+        } else if (percentage >= 50) {
+            emoji = "🦸‍♂️";
+            levelTitle = "Проснувшийся Герой";
+            levelText = "Отличная работа! Твой мозг уже вернулся с каникул, но парочка правил всё ещё нежится на солнышке. Ты молодец, но есть что вспомнить! Стряхни песок с учебников, повтори то, что забылось, и к 1 сентября ты будешь просто непобедим! ⭐";
+        } else {
+            emoji = "🦥";
+            levelTitle = "Счастливый Ленивец";
+            levelText = "Ну что ж, есть хорошая новость &mdash; ты ка-а-ак следует отдохнул! Твоя батарейка заряжена на максимум. Но вот знания немножко впали в спячку. Без паники! У тебя в запасе есть целый месяц до начала сентября, чтобы проснуться, потянуться и как следует прокачать свои навыки. Время пошло! ⏰";
+        }
+
+        document.getElementById('result-emoji').innerText = emoji;
+        document.getElementById('result-level').innerText = `Уровень: ${levelTitle}`;
+        document.getElementById('result-text').innerHTML = levelText;
+    }
+</script>
+
+</body>
+</html>
+
