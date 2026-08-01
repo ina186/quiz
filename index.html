@@ -19,7 +19,7 @@
 
         body {
             margin: 0;
-            padding: 20px 0; 
+            padding: 30px 15px; /* Задаем безопасные отступы сверху и снизу */
             min-height: 100vh;
             font-family: 'Nunito', sans-serif;
             background-color: #ffffff;
@@ -29,7 +29,7 @@
                 radial-gradient(circle at 50% 50%, rgba(255, 170, 165, 0.2) 0%, transparent 60%);
             background-attachment: fixed;
             display: flex;
-            align-items: flex-start;
+            align-items: flex-start; /* Жестко привязываем к верху, чтобы не обрезалось на маленьких экранах */
             justify-content: center;
             color: var(--text-main);
             overflow-x: hidden;
@@ -37,9 +37,10 @@
         }
 
         .app-container {
-            width: calc(100% - 30px);
+            width: 100%;
             max-width: 750px;
-            margin: auto; 
+            min-height: calc(100vh - 60px); /* Занимаем весь экран за вычетом отступов */
+            margin: 0; /* Убираем margin auto, который ломал позиционирование */
             padding: 40px 30px;
             background: var(--white-glass);
             backdrop-filter: blur(20px);
@@ -57,6 +58,7 @@
             display: none;
             flex-direction: column;
             flex-grow: 1;
+            justify-content: center; /* Внутреннее центрирование контента на экране */
             animation: fadeIn 0.4s ease-out;
         }
 
@@ -245,7 +247,6 @@
             margin: 0;
         }
 
-        /* Кастомный фокус для активного поля (особенно важно для часов, где 2 поля) */
         input[type="number"].active-input,
         input[type="number"]:focus {
             border-color: var(--purple);
@@ -379,7 +380,7 @@
 
         /* Виртуальная клавиатура для мобильных */
         .custom-keypad {
-            display: none; /* По умолчанию скрыта */
+            display: none;
             width: 100%;
             max-width: 350px;
             margin: 0 auto 20px auto;
@@ -431,8 +432,8 @@
         }
 
         @media (min-width: 601px) {
-            .custom-keypad.visible {
-                display: none !important; /* На компах принудительно скрываем */
+            .custom-keypad {
+                display: none !important;
             }
         }
 
@@ -461,10 +462,13 @@
         
         /* Мобильная адаптация */
         @media (max-width: 600px) {
+            body {
+                padding: 15px 10px;
+            }
             .app-container {
-                width: calc(100% - 20px);
                 padding: 25px 15px;
                 border-radius: 30px;
+                min-height: calc(100vh - 30px);
             }
             .main-title { font-size: 2.5rem; }
             .task-topic { font-size: 1.8rem; margin-bottom: 10px; }
@@ -489,7 +493,7 @@
                 font-size: 1.5rem;
             }
             
-            .huge-emoji { font-size: 120px; }
+            .huge-emoji { font-size: 120px; margin-top: 20px; }
             .result-level { font-size: 2rem; }
             .result-text { font-size: 1.3rem; padding: 20px; }
             .btn-modern { font-size: 1.4rem; padding: 15px; margin-bottom: 10px; }
@@ -570,17 +574,15 @@
 </div>
 
 <script>
-    // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
     let tasks = [];
     let currentTaskIndex = 0;
     let score = 0;
-    let activeInput = null; // Хранит активное поле ввода для мобильной клавиатуры
+    let activeInput = null; 
 
     function rand(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // --- БЕЗОПАСНАЯ ГЕНЕРАЦИЯ (Исключение повторов подряд) ---
     function shareNumber(p1, p2) {
         if(!p1 || !p2) return false;
         return p1[0]===p2[0] || p1[0]===p2[1] || p1[1]===p2[0] || p1[1]===p2[1];
@@ -626,7 +628,6 @@
         }
     }
 
-    // --- ГЕНЕРАТОРЫ ПРИМЕРОВ ---
     function generateValidAddSub(withCross) {
         let tries = 0;
         while(tries < 1000) {
@@ -785,7 +786,6 @@
         renderTask();
     }
 
-    // Функция для обработки виртуальной клавиатуры
     function setActiveInput(el) {
         activeInput = el;
         document.querySelectorAll('input').forEach(inp => inp.classList.remove('active-input'));
@@ -896,14 +896,12 @@
             drawClock("clockCanvas", task.h, task.m);
         }
 
-        // Логика работы с полями ввода и клавиатурой
         const inputs = content.querySelectorAll('input');
         const isMobile = window.innerWidth <= 600 || ('ontouchstart' in window);
 
         if (inputs.length > 0) {
             inputs.forEach(inp => {
                 if (isMobile) {
-                    // Запрещаем появление системной клавиатуры на мобильных
                     inp.setAttribute('readonly', 'true'); 
                 }
                 inp.addEventListener('focus', function() { setActiveInput(this); });
@@ -913,21 +911,21 @@
                 });
             });
 
-            // Автоматически активируем первое поле
             setActiveInput(inputs[0]);
 
             if (isMobile) {
-                // На мобильных показываем кастомную клавиатуру
                 customKeypad.classList.add('visible');
             } else {
-                // На десктопе скрываем её и фокусируемся для физической клавиатуры
                 customKeypad.classList.remove('visible');
+                // Добавлен автоматический фокус поля ввода для десктопа
                 setTimeout(() => {
-                    if (activeInput) activeInput.focus();
+                    if (activeInput) {
+                        activeInput.focus();
+                        setActiveInput(activeInput);
+                    }
                 }, 50);
             }
         } else {
-            // Если полей ввода нет (задание на сравнение), скрываем клавиатуру
             customKeypad.classList.remove('visible');
             activeInput = null;
         }
